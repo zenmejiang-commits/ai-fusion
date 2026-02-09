@@ -1,0 +1,32 @@
+# AI Fusion
+
+**免费的多模型AI聚合插件 - 使用自己的API Key**
+
+## 安装
+
+1. 下载最新版本的 [AI Fusion](https://chrome.google.com/webstore/detail/ai-fusion/xxx)
+2. 点击"添加至Chrome"
+3. 配置你的API Key，开始使用！
+
+## 功能
+
+- 🤖 多模型支持：GPT-4、GPT-3.5、Claude、DeepSeek、Kimi
+- 💬 侧边栏对话
+- 🖱️ 右键菜单：总结、翻译、优化
+- 💾 本地存储
+- 🔒 隐私保护
+
+## 配置
+
+1. 点击插件图标
+2. 进入设置
+3. 输入你的API Key
+4. 选择默认模型
+
+## 支持
+
+如有问题，请提交 [Issue](https://github.com/yourname/ai-fusion/issues)
+
+## 许可证
+
+MIT License

@@ -1,0 +1,13 @@
+git init
+git add .
+git commit -m "Initial commit: AI Fusion Chrome Extension
+
+Features:
+- Multi-model support (GPT/Claude/DeepSeek/Kimi)
+- Sidebar chat interface
+- Context menu actions (summarize/translate/improve)
+- Local storage with IndexedDB
+- Dark mode UI"
+git branch -M main
+git remote add origin https://github.com/zenmejiang-commits/ai-fusion.git
+git push -u origin main
