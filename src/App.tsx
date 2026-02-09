@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getConversations, saveConversation, getSettings, saveSettings } from './services/storage';
 import { chatWithAI } from './services/api';
 import type { Message, Conversation, Model } from './types';
 import './App.css';
 
 const MODELS: Record<string, Model> = {
-  'gpt-4': { name: 'GPT-4', provider: 'openai', maxTokens: 8192 },
-  'gpt-3.5-turbo': { name: 'GPT-3.5', provider: 'openai', maxTokens: 4096 },
-  'claude-3-sonnet': { name: 'Claude-3-Sonnet', provider: 'anthropic', maxTokens: 200000 },
-  'deepseek-chat': { name: 'DeepSeek', provider: 'deepseek', maxTokens: 16384 },
-  'moonshot-v1-8k': { name: 'Kimi', provider: 'moonshot', maxTokens: 8192 },
+  'gpt-4': { id: 'gpt-4', name: 'GPT-4', provider: 'openai', maxTokens: 8192 },
+  'gpt-3.5-turbo': { id: 'gpt-3.5-turbo', name: 'GPT-3.5', provider: 'openai', maxTokens: 4096 },
+  'claude-3-sonnet': { id: 'claude-3-sonnet', name: 'Claude-3-Sonnet', provider: 'anthropic', maxTokens: 200000 },
+  'deepseek-chat': { id: 'deepseek-chat', name: 'DeepSeek', provider: 'deepseek', maxTokens: 16384 },
+  'moonshot-v1-8k': { id: 'moonshot-v1-8k', name: 'Kimi', provider: 'moonshot', maxTokens: 8192 },
 };
 
 function App() {
@@ -20,18 +20,18 @@ function App() {
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [activeTab, setActiveTab] = useState<'chat' | 'settings'>('chat');
 
   useEffect(() => {
     loadData();
   }, []);
 
   async function loadData() {
-    const [savedConvs, savedSettings] = await Promise.all([
-      getConversations(),
-      getSettings()
-    ]);
-    setConversations(savedConvs);
+    const savedConvs = await getConversations();
+    const savedSettings = await getSettings();
+    
+    if (Array.isArray(savedConvs)) {
+      setConversations(savedConvs);
+    }
     setApiKeys(savedSettings.apiKeys || {});
     if (savedSettings.defaultModel) {
       setCurrentModel(savedSettings.defaultModel);
@@ -47,7 +47,6 @@ function App() {
     if (!apiKey) {
       alert(`请先在设置中配置 ${model.name} 的API Key`);
       setShowSettings(true);
-      setActiveTab('settings');
       return;
     }
 
@@ -80,8 +79,7 @@ function App() {
         createdAt: Date.now()
       };
       
-      const updatedConvs = [newConversation, ...conversations.slice(0, 9)];
-      setConversations(updatedConvs);
+      setConversations(prev => [newConversation, ...prev.slice(0, 9)]);
       await saveConversation(newConversation);
       
     } catch (error) {
@@ -101,7 +99,6 @@ function App() {
     setCurrentModel(defaultModel);
     await saveSettings({ apiKeys: newKeys, defaultModel });
     setShowSettings(false);
-    setActiveTab('chat');
   }
 
   return (
@@ -183,7 +180,6 @@ function App() {
   );
 }
 
-// Settings Panel Component
 function SettingsPanel({ 
   apiKeys, 
   currentModel, 

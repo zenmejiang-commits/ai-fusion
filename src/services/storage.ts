@@ -1,19 +1,10 @@
-// IndexedDB Storage Service
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
+import type { Conversation } from '../types';
 
 interface AIFusionDB extends DBSchema {
   conversations: {
     key: string;
-    value: {
-      id: string;
-      model: string;
-      messages: Array<{
-        role: string;
-        content: string;
-        timestamp: number;
-      }>;
-      createdAt: number;
-    };
+    value: Conversation;
     indexes: { 'by-date': number };
   };
   settings: {
@@ -36,13 +27,11 @@ async function getDB(): Promise<IDBPDatabase<AIFusionDB>> {
   
   dbInstance = await openDB<AIFusionDB>(DB_NAME, DB_VERSION, {
     upgrade(db) {
-      // Conversations store
       if (!db.objectStoreNames.contains('conversations')) {
         const convStore = db.createObjectStore('conversations', { keyPath: 'id' });
         convStore.createIndex('by-date', 'createdAt');
       }
       
-      // Settings store
       if (!db.objectStoreNames.contains('settings')) {
         db.createObjectStore('settings', { keyPath: 'id' });
       }
@@ -52,32 +41,13 @@ async function getDB(): Promise<IDBPDatabase<AIFusionDB>> {
   return dbInstance;
 }
 
-// Conversation operations
-export async function getConversations(): Promise<Array<{
-  id: string;
-  model: string;
-  messages: Array<{
-    role: string;
-    content: string;
-    timestamp: number;
-  }>;
-  createdAt: number;
-}>> {
+export async function getConversations(): Promise<Conversation[]> {
   const db = await getDB();
   const conversations = await db.getAllFromIndex('conversations', 'by-date');
-  return conversations.reverse(); // newest first
+  return conversations.reverse();
 }
 
-export async function saveConversation(conversation: {
-  id: string;
-  model: string;
-  messages: Array<{
-    role: string;
-    content: string;
-    timestamp: number;
-  }>;
-  createdAt: number;
-}): Promise<void> {
+export async function saveConversation(conversation: Conversation): Promise<void> {
   const db = await getDB();
   await db.put('conversations', conversation);
 }
@@ -92,7 +62,6 @@ export async function clearConversations(): Promise<void> {
   await db.clear('conversations');
 }
 
-// Settings operations
 interface Settings {
   apiKeys: Record<string, string>;
   defaultModel: string;
@@ -118,7 +87,6 @@ export async function saveSettings(settings: Partial<Settings>): Promise<void> {
   await db.put('settings', merged);
 }
 
-// Clear all data
 export async function clearAllData(): Promise<void> {
   const db = await getDB();
   await Promise.all([

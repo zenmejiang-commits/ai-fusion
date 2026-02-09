@@ -1,16 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import webExtension from 'vite-plugin-web-extension';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    webExtension({
-      assets: 'public',
-      manifest: 'src/manifest.json',
-    }),
-  ],
+  plugins: [react()],
   build: {
     outDir: 'dist',
+    rollupOptions: {
+      input: {
+        popup: 'src/popup.html',
+        sidepanel: 'src/sidepanel.html',
+      },
+    },
   },
 });

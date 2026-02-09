@@ -1,4 +1,3 @@
-// TypeScript 类型定义
 export interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
@@ -13,6 +12,7 @@ export interface Conversation {
 }
 
 export interface Model {
+  id: string;
   name: string;
   provider: 'openai' | 'anthropic' | 'deepseek' | 'moonshot';
   maxTokens: number;
